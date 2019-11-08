@@ -1,0 +1,123 @@
+version: '3.7'
+
+services:
+#docker build -t angular .
+#docker run -it -v ${PWD}:/app -v /app/node_modules -p 4200:4200 --rm angular
+#  angular_service:
+#    container_name: angular_container
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#    ports:
+#      - '4200:4200'
+#    depends_on:
+#      - backend_service
+
+#    volumes:
+#      - './frontend:/app'
+#      - '/app/node_modules'
+
+
+
+
+#docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3-management
+#docker run -d --hostname my-rabbit --name some-rabbit -p 8080:15672 rabbitmq:3-management
+#docker run -d --hostname some-rabbit --name some-rabbit --network some-network -e RABBITMQ_ERLANG_COOKIE='secret cookie here' rabbitmq:3
+#docker run -d --hostname my-rabbit --name some-rabbit rabbitmq:3
+  rabbitmq_service:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_container
+    #hostname: rabbitmq_host
+    ports:
+      - 15671:15671
+      - 15672:15672
+      - 5672:5672
+    tty: true
+#    links:
+#      - backend_service
+#    networks:
+#      net1:
+
+#    expose:
+#      - 5672
+#    environment:
+#      RABBITMQ_ERLANG_COOKIE: 6085e2412b6fa88647466c6a81c0cea0
+#      RABBITMQ_DEFAULT_USER: rabbitmq
+#      RABBITMQ_DEFAULT_PASS: rabbitmq
+#      RABBITMQ_DEFAULT_VHOST: /
+
+
+  backend_service:
+    container_name: backend_container
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - rabbitmq_service
+    restart: unless-stopped
+#    command: sh -c './backend/wait-for rabbitmq_service:5672 -- npm start'
+#    links:
+#      - rabbitmq_service
+#    networks:
+#      net1:
+#      net2:
+#
+#networks:
+#  net1:
+#  net2:
+
+
+
+#docker build -t <your username>/node-web-app .
+#docker run -p 49160:8080 -d <your username>/node-web-app
+#  backend_service:
+#    container_name: backend_container
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
+#    volumes:
+#      - './backend:/usr/src/app'
+#      - '/usr/src/app/node_modules'
+#      #- ':/usr/src/app/node_modules'
+#    ports:
+#      - 3000:3000
+#    links:
+#      - rabbitmq_service
+#    depends_on:
+#      - rabbitmq_service
+#    command: bash -c "npm install && node receive_logs.js"
+#    env_file:
+#      ./backend/un.env
+#    command: ["./wait-for-it.sh", "rabbitmq_service:5672", "-t", "120", "--", "node", "receive_logs.js"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#-----working----------This is locally installed that is running
+#docker build -t myrabbitmq .
+#docker run -it -h rabbitmqhost -p 1883:1883 -p 15672:15672 -v /opt/rabbitmq:/var/lib/rabbitmq myrabbitmq
+#  myrabbitmq_service:
+#    container_name: myrabbitmq_container
+#    hostname: rabbitmqhost
+#    build:
+#      context: ./broker
+#      dockerfile: Dockerfile
+#    ports:
+#      - '1883:1883'
+#      - '15672:15672'
+#      - '5672:5672'
+#    volumes:
+#      - './broker:/app'
+#      - '/app/node_modules'

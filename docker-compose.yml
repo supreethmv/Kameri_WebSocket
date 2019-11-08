@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  angular_service:
+    container_name: angular_container
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend:/app'
+      - '/app/node_modules'
+    ports:
+      - 4200:4200
+
+  rabbitmq_service:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_container
+    ports:
+      - 15671:15671
+      - 15672:15672
+      - 5672:5672
+
+  backend_service:
+    container_name: backend_container
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - rabbitmq_service
+    restart: unless-stopped
+    volumes:
+      - './backend:/usr/src/app'
+      - '/usr/src/app/node_modules'
