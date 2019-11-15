@@ -20,32 +20,62 @@ io.on('connection',function(socket){
         if (error1) {
             throw error1;
         }
-        var exchange = 'logs';
-
-        channel.assertExchange(exchange, 'fanout', {
+        var exchange = 'robot';
+        channel.assertExchange(exchange, 'topic', {
             durable: false
-        });
-
-        channel.assertQueue('', {
+          });
+          channel.assertQueue('', {
             exclusive: true
-        }, function(error2, q) {
+          }, function(error2, q) {
             if (error2) {
-                throw error2;
+              throw error2;
             }
-            console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-            channel.bindQueue(q.queue, exchange, '');
+            var args=['kameri.data.robot.#'];
+            console.log(' [*] Waiting for logs. To exit press CTRL+C');
 
-            channel.consume(q.queue, function(msg) {
-                if (msg.content) {
-                    console.log(" [x] Received:  %s", msg.content.toString());
-                    socket.emit('test_event',JSON.parse(msg.content.toString()).value);
-                    console.log(" [XXX] Sent to Dashboard:  %s",JSON.parse(msg.content.toString()).value);
-                }
-            }, {
+            args.forEach(function(key) {
+                channel.bindQueue(q.queue, exchange, key);
+              });
+
+              channel.consume(q.queue, function(msg) {
+                  if (msg.content) {
+                console.log(" [x] Received:  %s", msg.content.toString());
+                console.log(" [x] Routing Key:  %s", msg.fields.routingKey);
+                socket.emit('test_event',JSON.parse(msg.content.toString()).value);
+                console.log(" [XXX] Sent to Dashboard:  %s",JSON.parse(msg.content.toString()).value);
+            }
+        }, {
                 noAck: true
+              });
             });
         });
-    });
+
+    //    var exchange = 'logs';
+//
+    //    channel.assertExchange(exchange, 'fanout', {
+    //        durable: false
+    //    });
+//
+    //    channel.assertQueue('', {
+    //        exclusive: true
+    //    }, function(error2, q) {
+    //        if (error2) {
+    //            throw error2;
+    //        }
+    //        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+    //        channel.bindQueue(q.queue, exchange, '');
+//
+    //        channel.consume(q.queue, function(msg) {
+    //            if (msg.content) {
+    //                console.log(" [x] Received:  %s", msg.content.toString());
+    //                socket.emit('test_event',JSON.parse(msg.content.toString()).value);
+    //                console.log(" [XXX] Sent to Dashboard:  %s",JSON.parse(msg.content.toString()).value);
+    //            }
+    //        }, {
+    //            noAck: true
+    //        });
+    //    });
+    //});
 });
 });
 
